@@ -1,1 +1,7 @@
-还没
+从网络安装插件:
+
+```
+https://raw.bgithub.xyz/Lirzh/MusicFree-plugins-images/refs/heads/main/plugins.json
+```
+
+以使用bgithub.xyz给国内用户加速
