@@ -9,11 +9,18 @@ jobs:
   update-plugins:
     runs-on: ubuntu-latest
     steps:
-      - name: 检出代码
+      - name: 检出代码 (使用 PERSONAL_TOKEN)
+        if: ${{ secrets.PERSONAL_TOKEN != '' }}
         uses: actions/checkout@v4
         with:
           persist-credentials: false
-          token: ${{ secrets.PERSONAL_TOKEN || github.token }}
+          token: ${{ secrets.PERSONAL_TOKEN }}
+          
+      - name: 检出代码 (使用默认 token)
+        if: ${{ secrets.PERSONAL_TOKEN == '' }}
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: 设置 Node.js 环境
         uses: actions/setup-node@v4
