@@ -3,21 +3,13 @@ name: 每日更新所有插件
 on:
   schedule:
     - cron: '0 0 * * *'  # 每天 UTC 时间 0 点运行（北京时间 8 点）
-  workflow_dispatch:  # 允许手动触发
+  workflow_dispatch:    # 允许手动触发
 
 jobs:
   update-plugins:
     runs-on: ubuntu-latest
     steps:
-      - name: 检出代码 (使用 PERSONAL_TOKEN)
-        if: ${{ secrets.PERSONAL_TOKEN != '' }}
-        uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-          token: ${{ secrets.PERSONAL_TOKEN }}
-          
       - name: 检出代码 (使用默认 token)
-        if: ${{ secrets.PERSONAL_TOKEN == '' }}
         uses: actions/checkout@v4
         with:
           persist-credentials: false
@@ -28,7 +20,7 @@ jobs:
           node-version: '20'
 
       - name: 安装依赖
-        run: npm install axios fs path
+        run: npm install axios
 
       - name: 创建更新脚本
         run: |
@@ -249,4 +241,4 @@ jobs:
         run: |
           git add .
           git commit -m "自动更新所有插件 (每日更新)"
-          git push https://x-access-token:${{ secrets.PERSONAL_TOKEN }}@github.com/${{ github.repository }}.git HEAD:${{ github.ref }}
+          git push https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git HEAD:${{ github.ref }}
