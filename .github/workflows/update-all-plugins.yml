@@ -1,0 +1,245 @@
+name: 每日更新所有插件
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # 每天 UTC 时间 0 点运行（北京时间 8 点）
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  update-plugins:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          token: ${{ secrets.PERSONAL_TOKEN }}
+
+      - name: 设置 Node.js 环境
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 安装依赖
+        run: npm install axios fs path
+
+      - name: 创建更新脚本
+        run: |
+          cat > update-all-plugins.js << 'EOF'
+          const fs = require('fs');
+          const path = require('path');
+          const axios = require('axios');
+
+          // 设置 axios 超时和重试配置
+          axios.defaults.timeout = 30000;
+          axios.defaults.validateStatus = function (status) {
+            return status >= 200 && status < 300;
+          };
+
+          // 重试请求函数
+          async function requestWithRetry(url, retries = 3) {
+            for (let i = 0; i < retries; i++) {
+              try {
+                const response = await axios.get(url, {
+                  headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                  }
+                });
+                return response.data;
+              } catch (error) {
+                console.warn(`请求失败 (${i+1}/${retries}): ${url}`, error.message);
+                if (i === retries - 1) {
+                  throw error;
+                }
+                await new Promise(resolve => setTimeout(resolve, 2000 * (i+1))); // 指数退避
+              }
+            }
+          }
+
+          // 提取文件中的 srcUrl
+          function extractSrcUrl(fileContent) {
+            const srcUrlMatch = fileContent.match(/srcUrl:\s*["']([^"']+)["']/);
+            return srcUrlMatch ? srcUrlMatch[1] : null;
+          }
+
+          // 提取文件中的版本号
+          function extractVersion(fileContent) {
+            const versionMatch = fileContent.match(/version:\s*["']([^"']+)["']/);
+            return versionMatch ? versionMatch[1] : '0.0.0';
+          }
+
+          // 递增版本号
+          function incrementVersion(version) {
+            const parts = version.split('.');
+            parts[2] = String(parseInt(parts[2] || '0') + 1);
+            return parts.join('.');
+          }
+
+          // 更新 plugins.json 中的版本号
+          async function updatePluginsJson(pluginName, newVersion) {
+            try {
+              const pluginsPath = path.join(__dirname, 'plugins.json');
+              const pluginsData = JSON.parse(fs.readFileSync(pluginsPath, 'utf8'));
+              
+              const plugin = pluginsData.plugins.find(p => p.name === pluginName);
+              if (plugin) {
+                plugin.version = newVersion;
+                fs.writeFileSync(pluginsPath, JSON.stringify(pluginsData, null, 2), 'utf8');
+                console.log(`已更新 plugins.json 中的 ${pluginName} 版本为 ${newVersion}`);
+                return true;
+              } else {
+                console.warn(`在 plugins.json 中未找到插件: ${pluginName}`);
+                return false;
+              }
+            } catch (error) {
+              console.error(`更新 plugins.json 时出错:`, error);
+              return false;
+            }
+          }
+
+          // 获取插件名称
+          function extractPluginName(fileContent) {
+            const nameMatch = fileContent.match(/platform:\s*["']([^"']+)["']/);
+            return nameMatch ? nameMatch[1] : null;
+          }
+
+          // 主更新函数
+          async function updateAllPlugins() {
+            try {
+              console.log('开始更新所有插件...');
+              
+              // 获取目录下所有 JS 文件
+              const files = fs.readdirSync(__dirname)
+                .filter(file => file.endsWith('.js') && file !== 'update-all-plugins.js');
+              
+              console.log(`找到 ${files.length} 个插件文件`);
+              
+              let updatedCount = 0;
+              let failedCount = 0;
+              const failedPlugins = [];
+              
+              // 遍历所有插件文件
+              for (const file of files) {
+                const filePath = path.join(__dirname, file);
+                console.log(`\n处理插件: ${file}`);
+                
+                try {
+                  // 读取当前文件内容
+                  const currentContent = fs.readFileSync(filePath, 'utf8');
+                  
+                  // 提取 srcUrl
+                  const srcUrl = extractSrcUrl(currentContent);
+                  if (!srcUrl) {
+                    console.warn(`未找到 srcUrl，跳过文件: ${file}`);
+                    continue;
+                  }
+                  
+                  console.log(`源地址: ${srcUrl}`);
+                  
+                  // 从 srcUrl 下载最新内容
+                  console.log('正在下载最新版本...');
+                  const latestContent = await requestWithRetry(srcUrl);
+                  
+                  // 检查内容是否有变化
+                  if (currentContent.trim() === latestContent.trim()) {
+                    console.log('插件已是最新版本，无需更新');
+                    continue;
+                  }
+                  
+                  // 提取插件名称
+                  const pluginName = extractPluginName(currentContent);
+                  
+                  // 提取并递增版本号
+                  const currentVersion = extractVersion(currentContent);
+                  const newVersion = incrementVersion(currentVersion);
+                  
+                  // 更新版本号
+                  let updatedContent = latestContent;
+                  if (updatedContent.includes('version:')) {
+                    updatedContent = updatedContent.replace(/version:\s*["'][^"']*["']/, `version: "${newVersion}"`);
+                  } else {
+                    // 如果没有 version 字段，尝试在合适位置添加
+                    const moduleExportsMatch = updatedContent.match(/module\.exports\s*=\s*{/);
+                    if (moduleExportsMatch) {
+                      const insertPos = moduleExportsMatch.index + moduleExportsMatch[0].length;
+                      updatedContent = updatedContent.slice(0, insertPos) + 
+                        `\n    version: "${newVersion}",` + 
+                        updatedContent.slice(insertPos);
+                    }
+                  }
+                  
+                  // 写入更新后的内容
+                  fs.writeFileSync(filePath, updatedContent, 'utf8');
+                  console.log(`插件已更新到版本: ${newVersion}`);
+                  
+                  // 更新 plugins.json
+                  if (pluginName) {
+                    await updatePluginsJson(pluginName, newVersion);
+                  }
+                  
+                  updatedCount++;
+                  
+                } catch (error) {
+                  console.error(`更新插件 ${file} 时出错:`, error.message);
+                  failedCount++;
+                  failedPlugins.push({ file, error: error.message });
+                }
+              }
+              
+              console.log(`\n更新完成！`);
+              console.log(`成功更新: ${updatedCount} 个插件`);
+              console.log(`更新失败: ${failedCount} 个插件`);
+              
+              if (failedCount > 0) {
+                console.log('失败的插件列表:');
+                failedPlugins.forEach(item => {
+                  console.log(`- ${item.file}: ${item.error}`);
+                });
+              }
+              
+              return { updatedCount, failedCount };
+              
+            } catch (error) {
+              console.error('更新过程中出现严重错误:', error);
+              throw error;
+            }
+          }
+
+          // 执行更新
+          updateAllPlugins().then(result => {
+            if (result.updatedCount > 0) {
+              console.log('插件更新成功！');
+              process.exit(0);
+            } else {
+              console.log('没有需要更新的插件。');
+              process.exit(0);
+            }
+          }).catch(err => {
+            console.error('更新失败:', err);
+            process.exit(1);
+          });
+          EOF
+
+      - name: 执行更新脚本
+        run: node update-all-plugins.js
+
+      - name: 配置 Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: 检查是否有变更
+        id: check_changes
+        run: |
+          if git diff --exit-code > /dev/null; then
+            echo "has_changes=false" >> $GITHUB_ENV
+          else
+            echo "has_changes=true" >> $GITHUB_ENV
+          fi
+
+      - name: 提交更改
+        if: env.has_changes == 'true'
+        run: |
+          git add .
+          git commit -m "自动更新所有插件 (每日更新)"
+          git push https://x-access-token:${{ secrets.PERSONAL_TOKEN }}@github.com/${{ github.repository }}.git HEAD:${{ github.ref }}
