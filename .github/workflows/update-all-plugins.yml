@@ -9,7 +9,7 @@ jobs:
   update-plugins:
     runs-on: ubuntu-latest
     steps:
-      - name: 检出代码 (使用默认 token)
+      - name: 检出代码
         uses: actions/checkout@v4
         with:
           persist-credentials: false
@@ -242,3 +242,13 @@ jobs:
           git add .
           git commit -m "自动更新所有插件 (每日更新)"
           git push https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git HEAD:${{ github.ref }}
+
+      - name: 清理临时文件
+        if: always()
+        run: |
+          echo "正在清理临时文件..."
+          rm -rf node_modules
+          rm -f package-lock.json
+          rm -f package.json
+          rm -f update-all-plugins.js
+          echo "清理完成！"
