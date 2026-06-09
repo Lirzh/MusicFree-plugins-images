@@ -1,7 +1,4 @@
-# MusicFree 插件转载 🎵
-
-> 本仓库为 [MusicFree](https://github.com/maotoumao/MusicFree) 桌面端音乐播放器的**插件转载**仓库，旨在方便用户集中获取第三方插件。
-> 所有插件的版权与解释权归原作者所有。
+# 插件转载
 
 ⚠️ **为避免因版权问题导致仓库不可访问，请在使用后自行备份。**
 
@@ -21,9 +18,9 @@
 
 ---
 
-## 一键安装 🚀
+## 一键安装
 
-在 MusicFree 应用中，从网络安装插件：
+从网络安装插件：
 
 ```
 https://gh-proxy.org/https://raw.githubusercontent.com/Lirzh/MusicFree-plugins-images/refs/heads/main/plugins.json
