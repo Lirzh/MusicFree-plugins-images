@@ -37,17 +37,4 @@ https://gh-proxy.org/https://raw.githubusercontent.com/Lirzh/MusicFree-plugins-i
 - **酷狗音乐**：`https://gh-proxy.org/https://raw.githubusercontent.com/Lirzh/MusicFree-plugins-images/refs/heads/main/kg.js`
 - **bilibili**：`https://gh-proxy.org/https://raw.githubusercontent.com/Lirzh/MusicFree-plugins-images/refs/heads/main/bilibili.js`
 
----
-
-## 插件更新 🔄
-
-插件已经实现了**自动更新**功能。只要你在 MusicFree 中启用了自动更新，后续的功能更新和修复会自动推送到你的设备上。
-
----
-
-## 说明 📝
-
-- 本项目的插件脚本为原始源码（`.js` 文件），打包后的版本部署在 `MusicFree-plugins-images` 仓库中，上面的链接直接指向打包版本。
-- 如果插件安装后无法使用，请检查 MusicFree 版本是否为最新，或在 Issues 中反馈。
-
 祝听歌愉快！🎶
