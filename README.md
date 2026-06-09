@@ -31,15 +31,6 @@ https://gh-proxy.org/https://raw.githubusercontent.com/Lirzh/MusicFree-plugins-i
 
 > 🛰 使用了 gh-proxy 代理加速，国内用户访问也很快～
 
-### 手动安装（可选）
-
-如果你只想安装某一个平台，也可以使用下面的单独链接：
-
-- **网易云音乐**：`https://gh-proxy.org/https://raw.githubusercontent.com/Lirzh/MusicFree-plugins-images/refs/heads/main/wyy.js`
-- **QQ 音乐**：`https://gh-proxy.org/https://raw.githubusercontent.com/Lirzh/MusicFree-plugins-images/refs/heads/main/qq.js`
-- **酷狗音乐**：`https://gh-proxy.org/https://raw.githubusercontent.com/Lirzh/MusicFree-plugins-images/refs/heads/main/kg.js`
-- **bilibili**：`https://gh-proxy.org/https://raw.githubusercontent.com/Lirzh/MusicFree-plugins-images/refs/heads/main/bilibili.js`
-
 ---
 
 ## 免责声明 📢
