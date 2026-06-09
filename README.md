@@ -1,9 +1,9 @@
-# MusicFree 插件合集 🎵
+# MusicFree 插件转载 🎵
 
-> 一个用于 [MusicFree](https://github.com/maotoumao/MusicFree) 桌面端音乐播放器的插件集合。
-> 这里是一个**插件避难所**：为技术交流目的而存在，随时可能因版权问题而删库跑路。
+> 本仓库为 [MusicFree](https://github.com/maotoumao/MusicFree) 桌面端音乐播放器的**插件转载**仓库，旨在方便用户集中获取第三方插件。
+> 所有插件的版权与解释权归原作者所有。
 
-⚠️ **请在 star/下载后尽快备份。仓库可能随时消失。**
+⚠️ **为避免因版权问题导致仓库不可访问，请在使用后自行备份。**
 
 ---
 
