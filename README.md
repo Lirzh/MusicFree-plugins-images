@@ -1,6 +1,9 @@
 # MusicFree 插件合集 🎵
 
-一款用于 [MusicFree](https://github.com/maotoumao/MusicFree) 桌面端音乐播放器的插件集合，让你可以在一个应用内畅听多个音乐平台。
+> 一个用于 [MusicFree](https://github.com/maotoumao/MusicFree) 桌面端音乐播放器的插件集合。
+> 这里是一个**插件避难所**：为技术交流目的而存在，随时可能因版权问题而删库跑路。
+
+⚠️ **请在 star/下载后尽快备份。仓库可能随时消失。**
 
 ---
 
@@ -37,4 +40,15 @@ https://gh-proxy.org/https://raw.githubusercontent.com/Lirzh/MusicFree-plugins-i
 - **酷狗音乐**：`https://gh-proxy.org/https://raw.githubusercontent.com/Lirzh/MusicFree-plugins-images/refs/heads/main/kg.js`
 - **bilibili**：`https://gh-proxy.org/https://raw.githubusercontent.com/Lirzh/MusicFree-plugins-images/refs/heads/main/bilibili.js`
 
-祝听歌愉快！🎶
+---
+
+## 免责声明 📢
+
+> 本仓库的所有代码仅用于个人学习与技术研究，**不提供任何音乐文件的存储、下载或分发服务。
+
+- 所有插件的功能仅为调用各平台**公开的官方接口**，不对接口的版权与解释权归相应平台所有。
+- 音乐版权归原作者/版权方所有，请在**尊重版权**的前提下使用。
+- 任何单位或个人认为本仓库内容有涉嫌侵犯合法权益的，应及时通知作者，作者收到通知确认后将**立即删除**相关内容。
+- 仓库本身不承担任何法律责任，使用本项目所产生的一切后果由使用者自行负责。
+
+**侵权必删。如有侵权，请联系处理。**
